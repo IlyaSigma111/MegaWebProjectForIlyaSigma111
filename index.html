@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>StudyPortal | Полное расписание</title>
+    <title>StudyPortal | Расписание + Заметки + Список продуктов</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -33,13 +33,6 @@
             --blur-amount: 15px;
             --sidebar-width: 280px;
             --container-padding: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            :root {
-                --sidebar-width: 0px;
-                --container-padding: 1rem;
-            }
         }
 
         /* ===== БАЗОВЫЕ СТИЛИ ===== */
@@ -116,7 +109,7 @@
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
-        /* ===== СТИЛЬ СТЕКЛО (GLASSMORPHISM) ===== */
+        /* ===== СТИЛЬ СТЕКЛО ===== */
         .glass-panel {
             background: var(--primary-bg);
             backdrop-filter: blur(var(--blur-amount));
@@ -159,6 +152,7 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+            box-shadow: var(--glass-shadow);
         }
 
         /* Сайдбар */
@@ -173,17 +167,19 @@
             border-radius: 0 32px 32px 0;
             backdrop-filter: blur(20px);
             padding: 2rem 0;
-            z-index: 100;
+            z-index: 1000;
             transition: transform 0.3s ease;
         }
 
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                box-shadow: none;
             }
             
             .sidebar.open {
                 transform: translateX(0);
+                box-shadow: var(--glass-shadow);
             }
             
             .menu-toggle {
@@ -286,6 +282,7 @@
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
+                padding: var(--container-padding);
                 padding-top: 5rem;
             }
         }
@@ -401,6 +398,7 @@
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
 
         .quick-action {
@@ -480,7 +478,7 @@
         }
 
         /* Заметки */
-        .notes-controls {
+        .notes-controls, .shopping-controls {
             margin-bottom: 2rem;
         }
 
@@ -547,6 +545,130 @@
 
         .note-actions button:hover {
             background: var(--accent-color);
+        }
+
+        /* Список продуктов */
+        .shopping-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .shopping-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .shopping-item.completed {
+            opacity: 0.6;
+        }
+
+        .shopping-item.completed .item-name {
+            text-decoration: line-through;
+        }
+
+        .shopping-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 1.1rem;
+        }
+
+        .item-category {
+            padding: 0.3rem 1rem;
+            background: var(--primary-bg);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            border: 1px solid var(--glass-border);
+        }
+
+        .item-quantity {
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: center;
+            padding: 0.3rem 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .shopping-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .shopping-actions button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shopping-actions button:hover {
+            background: var(--accent-color);
+        }
+
+        .add-item-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: var(--primary-bg);
+            padding: 1.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .add-item-form input,
+        .add-item-form select {
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .add-item-form input:focus,
+        .add-item-form select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .add-item-btn {
+            padding: 0.8rem 2rem;
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--accent-glow);
         }
 
         /* Календарь */
@@ -725,7 +847,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
-            z-index: 1000;
+            z-index: 2000;
             align-items: center;
             justify-content: center;
         }
@@ -844,6 +966,14 @@
             .resources-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .add-item-form {
+                flex-direction: column;
+            }
+            
+            .shopping-item {
+                flex-wrap: wrap;
+            }
         }
 
         @media (max-width: 480px) {
@@ -861,6 +991,19 @@
             
             .lesson-name {
                 font-size: 1rem;
+            }
+            
+            .shopping-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .item-category {
+                align-self: flex-start;
+            }
+            
+            .shopping-actions {
+                align-self: flex-end;
             }
         }
     </style>
@@ -898,6 +1041,10 @@
                 <button class="nav-item" data-tab="notes">
                     <i class="fas fa-pen"></i>
                     <span>Заметки</span>
+                </button>
+                <button class="nav-item" data-tab="shopping">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Список продуктов</span>
                 </button>
                 <button class="nav-item" data-tab="calendar">
                     <i class="fas fa-calendar-alt"></i>
@@ -979,7 +1126,7 @@
                     </div>
                 </div>
 
-                <!-- РАСПИСАНИЕ (полное: время + предметы) -->
+                <!-- РАСПИСАНИЕ -->
                 <div class="tab-content" id="schedule">
                     <h1 class="page-title">Полное расписание</h1>
                     
@@ -1204,7 +1351,33 @@
                         </button>
                     </div>
                     <div class="notes-container" id="notesContainer">
-                        <!-- Заметки из Firebase -->
+                        <div class="empty-state">Загрузка...</div>
+                    </div>
+                </div>
+
+                <!-- Список продуктов -->
+                <div class="tab-content" id="shopping">
+                    <h1 class="page-title">Список продуктов</h1>
+                    
+                    <div class="add-item-form glass-panel">
+                        <input type="text" id="itemName" placeholder="Название продукта">
+                        <input type="text" id="itemQuantity" placeholder="Количество (например: 1 кг, 2 шт)">
+                        <select id="itemCategory">
+                            <option value="Овощи и фрукты">🍎 Овощи и фрукты</option>
+                            <option value="Молочные продукты">🥛 Молочные продукты</option>
+                            <option value="Мясо и рыба">🥩 Мясо и рыба</option>
+                            <option value="Бакалея">🌾 Бакалея</option>
+                            <option value="Напитки">🧃 Напитки</option>
+                            <option value="Сладости">🍫 Сладости</option>
+                            <option value="Другое">📦 Другое</option>
+                        </select>
+                        <button class="add-item-btn" onclick="addShoppingItem()">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                    </div>
+                    
+                    <div class="shopping-container" id="shoppingContainer">
+                        <div class="empty-state">Загрузка...</div>
                     </div>
                 </div>
 
@@ -1224,7 +1397,7 @@
                     <div class="events-list glass-panel">
                         <h3>Предстоящие события</h3>
                         <div id="eventsContainer">
-                            <!-- События из Firebase -->
+                            <div class="empty-state">Нет событий</div>
                         </div>
                     </div>
                 </div>
@@ -1291,10 +1464,24 @@
         // Глобальные переменные
         let currentNoteId = null;
         let currentEventId = null;
+        let currentShoppingId = null;
 
         // ===== МОБИЛЬНОЕ МЕНЮ =====
-        document.getElementById('menuToggle')?.addEventListener('click', function() {
+        document.getElementById('menuToggle')?.addEventListener('click', function(e) {
+            e.stopPropagation();
             document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Закрытие меню при клике вне
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('menuToggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
         });
 
         // ===== НАВИГАЦИЯ ПО ВКЛАДКАМ =====
@@ -1412,14 +1599,12 @@
             
             try {
                 if (currentNoteId) {
-                    // Обновление
                     await db.collection('notes').doc(currentNoteId).update({
                         title,
                         content,
                         updatedAt: new Date()
                     });
                 } else {
-                    // Создание
                     await db.collection('notes').add({
                         title,
                         content,
@@ -1488,6 +1673,86 @@
             document.getElementById('noteTitle').value = note.title;
             document.getElementById('noteContent').value = note.content;
             openModal('noteModal');
+        }
+
+        // ===== СПИСОК ПРОДУКТОВ (FIREBASE) =====
+        async function addShoppingItem() {
+            const name = document.getElementById('itemName').value;
+            const quantity = document.getElementById('itemQuantity').value;
+            const category = document.getElementById('itemCategory').value;
+            
+            if (!name) {
+                alert('Введите название продукта');
+                return;
+            }
+            
+            try {
+                await db.collection('shopping').add({
+                    name,
+                    quantity: quantity || '1 шт',
+                    category,
+                    completed: false,
+                    createdAt: new Date()
+                });
+                
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemQuantity').value = '';
+                loadShoppingList();
+            } catch (error) {
+                alert('Ошибка при добавлении');
+            }
+        }
+
+        async function loadShoppingList() {
+            const container = document.getElementById('shoppingContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                const snapshot = await db.collection('shopping').orderBy('createdAt', 'desc').get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="empty-state">Список продуктов пуст</div>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    const completedClass = item.completed ? 'completed' : '';
+                    
+                    html += `
+                        <div class="shopping-item ${completedClass}" data-id="${doc.id}">
+                            <input type="checkbox" class="shopping-checkbox" ${item.completed ? 'checked' : ''} 
+                                onchange="toggleShoppingItem('${doc.id}', this.checked)">
+                            <span class="item-name">${escapeHtml(item.name)}</span>
+                            <span class="item-quantity">${escapeHtml(item.quantity || '1 шт')}</span>
+                            <span class="item-category">${escapeHtml(item.category)}</span>
+                            <div class="shopping-actions">
+                                <button onclick="deleteShoppingItem('${doc.id}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<div class="error">Ошибка загрузки</div>';
+            }
+        }
+
+        async function toggleShoppingItem(id, completed) {
+            await db.collection('shopping').doc(id).update({
+                completed: completed
+            });
+        }
+
+        async function deleteShoppingItem(id) {
+            if (confirm('Удалить продукт из списка?')) {
+                await db.collection('shopping').doc(id).delete();
+                loadShoppingList();
+            }
         }
 
         // ===== КАЛЕНДАРЬ/СОБЫТИЯ (FIREBASE) =====
@@ -1606,7 +1871,6 @@
             });
             html += '</div><div class="calendar-days">';
             
-            // Пустые ячейки до первого дня (понедельник = 1)
             let firstDayIndex = firstDay.getDay() || 7;
             firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
             
@@ -1614,7 +1878,6 @@
                 html += '<div class="calendar-day empty"></div>';
             }
             
-            // Дни месяца
             for (let d = 1; d <= lastDay.getDate(); d++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 html += `<div class="calendar-day" data-date="${dateStr}">${d}</div>`;
@@ -1623,7 +1886,6 @@
             html += '</div>';
             calendarGrid.innerHTML = html;
             
-            // Подсветка дней с событиями
             setTimeout(() => {
                 document.querySelectorAll('.calendar-day[data-date]').forEach(day => {
                     const date = day.dataset.date;
@@ -1675,21 +1937,10 @@
         // ===== ИНИЦИАЛИЗАЦИЯ =====
         document.addEventListener('DOMContentLoaded', function() {
             loadNotes();
+            loadShoppingList();
             updateCalendar();
             loadEvents();
             updateUpcomingWidget();
-            
-            // Закрытие меню при клике вне на мобильных
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    const sidebar = document.getElementById('sidebar');
-                    const toggle = document.getElementById('menuToggle');
-                    
-                    if (!sidebar.contains(e.target) && !toggle.contains(e.target) && sidebar.classList.contains('open')) {
-                        sidebar.classList.remove('open');
-                    }
-                }
-            });
         });
     </script>
 </body>
