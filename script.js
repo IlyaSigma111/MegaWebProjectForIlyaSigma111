@@ -2,6 +2,11 @@
 let currentNoteId = null;
 let currentEventId = null;
 
+// ===== МОБИЛЬНОЕ МЕНЮ =====
+document.getElementById('menuToggle')?.addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('open');
+});
+
 // ===== НАВИГАЦИЯ ПО ВКЛАДКАМ =====
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function() {
@@ -11,6 +16,11 @@ document.querySelectorAll('.nav-item').forEach(item => {
         this.classList.add('active');
         const tabId = this.dataset.tab;
         document.getElementById(tabId).classList.add('active');
+        
+        // Закрываем меню на мобильных
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('open');
+        }
     });
 });
 
@@ -20,33 +30,39 @@ function updateClock() {
     const time = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     const date = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     
-    document.querySelector('#clockWidget .time').textContent = time;
-    document.querySelector('#clockWidget .date').textContent = date;
+    const clockWidget = document.querySelector('#clockWidget');
+    if (clockWidget) {
+        clockWidget.querySelector('.time').textContent = time;
+        clockWidget.querySelector('.date').textContent = date;
+    }
 }
 setInterval(updateClock, 1000);
 updateClock();
 
 // ===== ПОГОДА =====
 async function getWeather() {
+    const weatherWidget = document.getElementById('weatherWidget');
+    if (!weatherWidget) return;
+    
     try {
-        const response = await fetch('https://wttr.in/?format=%t+%c');
+        const response = await fetch('https://wttr.in/?format=%t+%c&m');
         const data = await response.text();
-        document.getElementById('weatherWidget').innerHTML = `<div class="weather-info">${data}</div>`;
+        weatherWidget.innerHTML = `<div class="weather-info">${data}</div>`;
     } catch {
-        document.getElementById('weatherWidget').innerHTML = '<div class="weather-info">Погода: неизвестно</div>';
+        weatherWidget.innerHTML = '<div class="weather-info">Погода: неизвестно</div>';
     }
 }
 getWeather();
 
 // ===== ПОИСК =====
-document.getElementById('searchBtn').addEventListener('click', function() {
+document.getElementById('searchBtn')?.addEventListener('click', function() {
     const query = document.getElementById('globalSearch').value;
     if (query) {
         window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
     }
 });
 
-document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+document.getElementById('globalSearch')?.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         document.getElementById('searchBtn').click();
     }
@@ -67,12 +83,22 @@ function openModal(modalId, id = null) {
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
-    document.getElementById('noteTitle')?.value = '';
-    document.getElementById('noteContent')?.value = '';
-    document.getElementById('eventTitle')?.value = '';
-    document.getElementById('eventDate')?.value = '';
-    document.getElementById('eventTime')?.value = '';
-    document.getElementById('eventDesc')?.value = '';
+    
+    // Очистка полей
+    const title = document.getElementById('noteTitle');
+    const content = document.getElementById('noteContent');
+    const eventTitle = document.getElementById('eventTitle');
+    const eventDate = document.getElementById('eventDate');
+    const eventTime = document.getElementById('eventTime');
+    const eventDesc = document.getElementById('eventDesc');
+    
+    if (title) title.value = '';
+    if (content) content.value = '';
+    if (eventTitle) eventTitle.value = '';
+    if (eventDate) eventDate.value = '';
+    if (eventTime) eventTime.value = '';
+    if (eventDesc) eventDesc.value = '';
+    
     currentNoteId = null;
     currentEventId = null;
 }
@@ -121,6 +147,8 @@ async function saveNote() {
 
 async function loadNotes() {
     const container = document.getElementById('notesContainer');
+    if (!container) return;
+    
     container.innerHTML = '<div class="loading">Загрузка...</div>';
     
     try {
@@ -138,8 +166,8 @@ async function loadNotes() {
             
             html += `
                 <div class="note-card glass-panel" data-id="${doc.id}">
-                    <h3>${note.title}</h3>
-                    <p>${note.content}</p>
+                    <h3>${escapeHtml(note.title)}</h3>
+                    <p>${escapeHtml(note.content)}</p>
                     <small>${date}</small>
                     <div class="note-actions">
                         <button onclick="editNote('${doc.id}')"><i class="fas fa-edit"></i></button>
@@ -206,6 +234,7 @@ async function saveEvent() {
         closeModal('eventModal');
         loadEvents();
         updateCalendar();
+        updateUpcomingWidget();
     } catch (error) {
         alert('Ошибка при сохранении');
     }
@@ -213,6 +242,7 @@ async function saveEvent() {
 
 async function loadEvents() {
     const container = document.getElementById('eventsContainer');
+    if (!container) return;
     
     try {
         const snapshot = await db.collection('events').orderBy('date').get();
@@ -226,10 +256,10 @@ async function loadEvents() {
         snapshot.forEach(doc => {
             const event = doc.data();
             html += `
-                <div class="event-item glass-panel" data-id="${doc.id}">
+                <div class="event-item" data-id="${doc.id}">
                     <div class="event-date">${event.date} ${event.time || ''}</div>
-                    <div class="event-title">${event.title}</div>
-                    ${event.description ? `<div class="event-desc">${event.description}</div>` : ''}
+                    <div class="event-title">${escapeHtml(event.title)}</div>
+                    ${event.description ? `<div class="event-desc">${escapeHtml(event.description)}</div>` : ''}
                     <div class="event-actions">
                         <button onclick="editEvent('${doc.id}')"><i class="fas fa-edit"></i></button>
                         <button onclick="deleteEvent('${doc.id}')"><i class="fas fa-trash"></i></button>
@@ -239,7 +269,6 @@ async function loadEvents() {
         });
         
         container.innerHTML = html;
-        updateUpcomingWidget();
     } catch (error) {
         container.innerHTML = '<div class="error">Ошибка загрузки</div>';
     }
@@ -250,6 +279,7 @@ async function deleteEvent(id) {
         await db.collection('events').doc(id).delete();
         loadEvents();
         updateCalendar();
+        updateUpcomingWidget();
     }
 }
 
@@ -267,6 +297,8 @@ async function editEvent(id) {
 
 function updateCalendar() {
     const calendarGrid = document.getElementById('calendarGrid');
+    if (!calendarGrid) return;
+    
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
@@ -284,8 +316,11 @@ function updateCalendar() {
     });
     html += '</div><div class="calendar-days">';
     
-    // Пустые ячейки до первого дня
-    for (let i = 0; i < firstDay.getDay() - 1; i++) {
+    // Пустые ячейки до первого дня (понедельник = 1)
+    let firstDayIndex = firstDay.getDay() || 7; // 0 = воскресенье, 7 = воскресенье для нашей сетки
+    firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; // Преобразуем: пн=0, вт=1, ...
+    
+    for (let i = 0; i < firstDayIndex; i++) {
         html += '<div class="calendar-day empty"></div>';
     }
     
@@ -298,22 +333,23 @@ function updateCalendar() {
     html += '</div>';
     calendarGrid.innerHTML = html;
     
-    // Подгрузка событий
-    loadEvents().then(() => {
+    // Подсветка дней с событиями
+    setTimeout(() => {
         document.querySelectorAll('.calendar-day[data-date]').forEach(day => {
             const date = day.dataset.date;
-            // Подсветка дней с событиями
             db.collection('events').where('date', '==', date).get().then(snapshot => {
                 if (!snapshot.empty) {
                     day.classList.add('has-event');
                 }
             });
         });
-    });
+    }, 500);
 }
 
 async function updateUpcomingWidget() {
     const widget = document.getElementById('upcomingWidget');
+    if (!widget) return;
+    
     const today = new Date().toISOString().split('T')[0];
     
     try {
@@ -331,7 +367,7 @@ async function updateUpcomingWidget() {
         let html = '';
         snapshot.forEach(doc => {
             const event = doc.data();
-            html += `<div class="upcoming-item">${event.date}: ${event.title}</div>`;
+            html += `<div class="upcoming-item">${event.date}: ${escapeHtml(event.title)}</div>`;
         });
         widget.innerHTML = html;
     } catch {
@@ -339,9 +375,29 @@ async function updateUpcomingWidget() {
     }
 }
 
+// ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     loadNotes();
     updateCalendar();
+    loadEvents();
     updateUpcomingWidget();
+    
+    // Закрытие меню при клике вне на мобильных
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('menuToggle');
+            
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target) && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
 });
