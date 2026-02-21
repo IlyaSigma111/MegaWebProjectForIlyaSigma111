@@ -24,10 +24,6 @@
         --sidebar-width: 0px;
         --container-padding: 1rem;
     }
-    
-    .sidebar {
-        transform: translateX(-100%);
-    }
 }
 
 /* ===== БАЗОВЫЕ СТИЛИ ===== */
@@ -129,6 +125,26 @@ body {
     position: relative;
 }
 
+/* Кнопка меню для мобильных */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: var(--primary-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
 /* Сайдбар */
 .sidebar {
     width: var(--sidebar-width);
@@ -142,6 +158,21 @@ body {
     backdrop-filter: blur(20px);
     padding: 2rem 0;
     z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .menu-toggle {
+        display: flex;
+    }
 }
 
 .logo-container {
@@ -234,6 +265,13 @@ body {
     padding: var(--container-padding);
     position: relative;
     min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding-top: 5rem;
+    }
 }
 
 /* Поиск */
@@ -359,69 +397,70 @@ body {
     color: white;
     font-size: 1rem;
     cursor: pointer;
+    border-radius: 16px;
 }
 
-/* Расписание */
-.schedule-section {
-    margin-bottom: 2.5rem;
+@media (max-width: 768px) {
+    .quick-actions {
+        flex-direction: column;
+    }
 }
 
-.subsection-title {
+/* РАСПИСАНИЕ */
+.schedule-day {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.day-title {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
-    color: var(--text-primary);
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
 }
 
-.schedule-table {
-    overflow-x: auto;
-    padding: 1rem;
+.day-schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
 }
 
-.schedule-table table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-}
-
-.schedule-table th {
-    padding: 1rem;
-    text-align: left;
-    background: rgba(255, 255, 255, 0.1);
-    font-weight: 600;
-}
-
-.schedule-table td {
+.lesson-item {
+    display: flex;
+    align-items: center;
     padding: 0.8rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
-.schedule-table tr:last-child td {
-    border-bottom: none;
+.lesson-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
 }
 
-/* Предметы */
-.subjects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.subject-day {
-    padding: 1.5rem;
-}
-
-.subject-day h3 {
-    margin-bottom: 1rem;
+.lesson-time {
+    min-width: 120px;
+    font-weight: 600;
     color: var(--accent-color);
 }
 
-.subject-day ul {
-    list-style: none;
+.lesson-name {
+    flex: 1;
+    font-size: 1.1rem;
 }
 
-.subject-day li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+@media (max-width: 768px) {
+    .lesson-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .lesson-time {
+        min-width: auto;
+    }
 }
 
 /* Заметки */
@@ -439,6 +478,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    border-radius: 16px;
 }
 
 .notes-container {
@@ -455,6 +495,7 @@ body {
 .note-card h3 {
     margin-bottom: 1rem;
     padding-right: 60px;
+    font-size: 1.3rem;
 }
 
 .note-card p {
@@ -498,17 +539,19 @@ body {
 }
 
 .calendar-grid {
+    padding: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .calendar-header {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .calendar-month {
     font-size: 1.5rem;
     font-weight: 600;
+    text-transform: capitalize;
 }
 
 .calendar-weekdays {
@@ -540,15 +583,19 @@ body {
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 1.1rem;
 }
 
-.calendar-day:hover {
+.calendar-day:hover:not(.empty) {
     background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
 }
 
 .calendar-day.has-event {
     background: var(--accent-color);
     color: white;
+    font-weight: 600;
+    box-shadow: var(--accent-glow);
 }
 
 .calendar-day.empty {
@@ -562,12 +609,14 @@ body {
 
 .events-list h3 {
     margin-bottom: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .event-item {
     padding: 1rem;
     margin-bottom: 1rem;
     background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     position: relative;
 }
 
@@ -579,6 +628,7 @@ body {
     font-size: 0.9rem;
     color: var(--accent-color);
     margin-bottom: 0.3rem;
+    font-weight: 600;
 }
 
 .event-title {
@@ -608,6 +658,11 @@ body {
     height: 30px;
     border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.event-actions button:hover {
+    background: var(--accent-color);
 }
 
 /* Ресурсы */
@@ -621,6 +676,7 @@ body {
     padding: 2rem 1.5rem;
     text-align: center;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .resource-card i {
@@ -631,10 +687,16 @@ body {
 
 .resource-card h3 {
     margin-bottom: 0.5rem;
+    font-size: 1.3rem;
 }
 
 .resource-card p {
     color: var(--text-secondary);
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Модальные окна */
@@ -738,6 +800,15 @@ body {
     color: #ff6b6b;
 }
 
+.upcoming-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.upcoming-item:last-child {
+    border-bottom: none;
+}
+
 /* Адаптивность */
 @media (max-width: 1200px) {
     .widget-grid {
@@ -746,19 +817,11 @@ body {
 }
 
 @media (max-width: 768px) {
-    .main-content {
-        margin-left: 0;
-    }
-    
     .widget-grid {
         grid-template-columns: 1fr;
     }
     
-    .quick-actions {
-        flex-direction: column;
-    }
-    
-    .subjects-grid {
+    .notes-container {
         grid-template-columns: 1fr;
     }
     
@@ -774,5 +837,13 @@ body {
     
     .resources-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .lesson-time {
+        font-size: 0.9rem;
+    }
+    
+    .lesson-name {
+        font-size: 1rem;
     }
 }
