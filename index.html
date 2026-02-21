@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>StudyPortal | Расписание + Заметки + Календарь</title>
+    <title>StudyPortal | Полное расписание</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -22,8 +22,13 @@
     </div>
 
     <div class="app-container">
+        <!-- Кнопка меню для мобильных -->
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
         <!-- Сайдбар -->
-        <aside class="sidebar glass-panel">
+        <aside class="sidebar glass-panel" id="sidebar">
             <div class="logo-container">
                 <i class="fas fa-graduation-cap logo-icon"></i>
                 <h2 class="logo-text">Study<span>Portal</span></h2>
@@ -122,105 +127,217 @@
                     </div>
                 </div>
 
-                <!-- Расписание -->
+                <!-- РАСПИСАНИЕ (полное: время + предметы) -->
                 <div class="tab-content" id="schedule">
-                    <h1 class="page-title">Расписание звонков и предметы</h1>
+                    <h1 class="page-title">Полное расписание</h1>
                     
-                    <!-- Расписание звонков (1 смена) -->
-                    <div class="schedule-section">
-                        <h2 class="subsection-title">⏰ Звонки (1 смена)</h2>
-                        <div class="schedule-table glass-panel">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Понедельник</th>
-                                        <th>Вторник/Пятница</th>
-                                        <th>Среда</th>
-                                        <th>Четверг</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Разговоры о важном 8:00–8:30</td><td>1 урок 8:00–8:40</td><td>Классный час 8:00–8:20</td><td>Россия — моя горняшка 8:00–8:50</td></tr>
-                                    <tr><td>1 урок 8:35–9:15</td><td>2 урок 8:50–9:30</td><td>1 урок 8:25–9:05</td><td>1 урок 8:35–9:15</td></tr>
-                                    <tr><td>2 урок 9:35–10:15</td><td>3 урок 9:50–10:30</td><td>2 урок 9:15–9:55</td><td>2 урок 9:35–10:15</td></tr>
-                                    <tr><td>3 урок 10:35–11:15</td><td>4 урок 10:50–11:30</td><td>3 урок 10:15–10:55</td><td>3 урок 10:35–11:15</td></tr>
-                                    <tr><td>4 урок 11:35–12:15</td><td>5 урок 11:50–12:30</td><td>4 урок 11:15–11:55</td><td>4 урок 11:35–12:15</td></tr>
-                                    <tr><td>5 урок 12:30–13:10</td><td>6 урок 12:50–13:30</td><td>5 урок 12:15–12:55</td><td>5 урок 12:30–13:10</td></tr>
-                                    <tr><td>6 урок 13:20–14:00</td><td>7 урок 13:40–14:20</td><td>6 урок 13:15–13:55</td><td>6 урок 13:20–14:00</td></tr>
-                                    <tr><td>7 урок 14:10–14:50</td><td>8 урок 14:50–15:30</td><td>7 урок 14:05–14:45</td><td>7 урок 14:10–14:50</td></tr>
-                                    <tr><td>8 урок 15:00–15:40</td><td>9 урок 15:20–16:00</td><td>8 урок 15:05–15:35</td><td>8 урок 15:00–15:40</td></tr>
-                                    <tr><td>9 урок 15:50–16:30</td><td></td><td>9 урок 15:45–16:25</td><td>9 урок 15:50–16:30</td></tr>
-                                </tbody>
-                            </table>
+                    <!-- Понедельник -->
+                    <div class="schedule-day glass-panel">
+                        <h2 class="day-title">Понедельник</h2>
+                        <div class="day-schedule">
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:00 – 8:30</span>
+                                <span class="lesson-name">Разговоры о важном</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:35 – 9:15</span>
+                                <span class="lesson-name">Химия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">9:35 – 10:15</span>
+                                <span class="lesson-name">Английский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">10:35 – 11:15</span>
+                                <span class="lesson-name">Русский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">11:35 – 12:15</span>
+                                <span class="lesson-name">Физика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">12:30 – 13:10</span>
+                                <span class="lesson-name">Биология</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">13:20 – 14:00</span>
+                                <span class="lesson-name">Математика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">14:10 – 14:50</span>
+                                <span class="lesson-name">История</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Предметы по дням -->
-                    <div class="schedule-section">
-                        <h2 class="subsection-title">📚 Предметы</h2>
-                        
-                        <div class="subjects-grid">
-                            <div class="subject-day glass-panel">
-                                <h3>Понедельник</h3>
-                                <ul>
-                                    <li>Химия</li>
-                                    <li>Английский язык</li>
-                                    <li>Русский язык</li>
-                                    <li>Физика</li>
-                                    <li>Биология</li>
-                                    <li>Математика</li>
-                                    <li>История</li>
-                                </ul>
+                    <!-- Вторник -->
+                    <div class="schedule-day glass-panel">
+                        <h2 class="day-title">Вторник</h2>
+                        <div class="day-schedule">
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:00 – 8:40</span>
+                                <span class="lesson-name">География</span>
                             </div>
-                            
-                            <div class="subject-day glass-panel">
-                                <h3>Вторник</h3>
-                                <ul>
-                                    <li>География</li>
-                                    <li>ОБЗР</li>
-                                    <li>Математика</li>
-                                    <li>Физкультура</li>
-                                    <li>Обществознание</li>
-                                    <li>Литература</li>
-                                </ul>
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:50 – 9:30</span>
+                                <span class="lesson-name">ОБЗР</span>
                             </div>
-                            
-                            <div class="subject-day glass-panel">
-                                <h3>Среда</h3>
-                                <ul>
-                                    <li>Математика</li>
-                                    <li>Физкультура</li>
-                                    <li>Литература</li>
-                                    <li>Вероятность и стат.</li>
-                                    <li>Русский язык</li>
-                                    <li>Биология</li>
-                                    <li>Физика</li>
-                                </ul>
+                            <div class="lesson-item">
+                                <span class="lesson-time">9:50 – 10:30</span>
+                                <span class="lesson-name">Математика</span>
                             </div>
-                            
-                            <div class="subject-day glass-panel">
-                                <h3>Четверг</h3>
-                                <ul>
-                                    <li>Химия</li>
-                                    <li>Английский язык</li>
-                                    <li>История</li>
-                                    <li>Литература</li>
-                                    <li>Информатика</li>
-                                    <li>Математика</li>
-                                </ul>
+                            <div class="lesson-item">
+                                <span class="lesson-time">10:50 – 11:30</span>
+                                <span class="lesson-name">Физкультура</span>
                             </div>
-                            
-                            <div class="subject-day glass-panel">
-                                <h3>Пятница</h3>
-                                <ul>
-                                    <li>География</li>
-                                    <li>Русский язык</li>
-                                    <li>Математика</li>
-                                    <li>Английский язык</li>
-                                    <li>Физика</li>
-                                    <li>История/русский язык</li>
-                                    <li>Труд (технология)</li>
-                                </ul>
+                            <div class="lesson-item">
+                                <span class="lesson-time">11:50 – 12:30</span>
+                                <span class="lesson-name">Обществознание</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">12:50 – 13:30</span>
+                                <span class="lesson-name">Литература</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">13:40 – 14:20</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">14:50 – 15:30</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">15:20 – 16:00</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Среда -->
+                    <div class="schedule-day glass-panel">
+                        <h2 class="day-title">Среда</h2>
+                        <div class="day-schedule">
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:00 – 8:20</span>
+                                <span class="lesson-name">Классный час</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:25 – 9:05</span>
+                                <span class="lesson-name">Математика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">9:15 – 9:55</span>
+                                <span class="lesson-name">Физкультура</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">10:15 – 10:55</span>
+                                <span class="lesson-name">Литература</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">11:15 – 11:55</span>
+                                <span class="lesson-name">Вероятность и стат.</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">12:15 – 12:55</span>
+                                <span class="lesson-name">Русский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">13:15 – 13:55</span>
+                                <span class="lesson-name">Биология</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">14:05 – 14:45</span>
+                                <span class="lesson-name">Физика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">15:05 – 15:35</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">15:45 – 16:25</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Четверг -->
+                    <div class="schedule-day glass-panel">
+                        <h2 class="day-title">Четверг</h2>
+                        <div class="day-schedule">
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:00 – 8:50</span>
+                                <span class="lesson-name">Россия – моя горняшка</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:35 – 9:15</span>
+                                <span class="lesson-name">Химия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">9:35 – 10:15</span>
+                                <span class="lesson-name">Английский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">10:35 – 11:15</span>
+                                <span class="lesson-name">История</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">11:35 – 12:15</span>
+                                <span class="lesson-name">Литература</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">12:30 – 13:10</span>
+                                <span class="lesson-name">Информатика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">13:20 – 14:00</span>
+                                <span class="lesson-name">Математика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">14:10 – 14:50</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">15:00 – 15:40</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">15:50 – 16:30</span>
+                                <span class="lesson-name">Доп. занятия</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Пятница -->
+                    <div class="schedule-day glass-panel">
+                        <h2 class="day-title">Пятница</h2>
+                        <div class="day-schedule">
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:00 – 8:40</span>
+                                <span class="lesson-name">География</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">8:50 – 9:30</span>
+                                <span class="lesson-name">Русский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">9:50 – 10:30</span>
+                                <span class="lesson-name">Математика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">10:50 – 11:30</span>
+                                <span class="lesson-name">Английский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">11:50 – 12:30</span>
+                                <span class="lesson-name">Физика</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">12:50 – 13:30</span>
+                                <span class="lesson-name">История/русский язык</span>
+                            </div>
+                            <div class="lesson-item">
+                                <span class="lesson-time">13:40 – 14:20</span>
+                                <span class="lesson-name">Труд (технология)</span>
                             </div>
                         </div>
                     </div>
@@ -248,7 +365,7 @@
                         </button>
                     </div>
                     
-                    <div class="calendar-grid" id="calendarGrid">
+                    <div class="calendar-grid glass-panel" id="calendarGrid">
                         <!-- Календарь -->
                     </div>
                     
@@ -322,4 +439,4 @@
     <script src="firebase-config.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html>ыы
