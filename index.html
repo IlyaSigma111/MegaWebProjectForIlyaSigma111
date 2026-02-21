@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>StudyPortal | Расписание + Заметки + Календарь</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="gradient-bg">
+        <div class="gradient-sphere sphere-1"></div>
+        <div class="gradient-sphere sphere-2"></div>
+        <div class="gradient-sphere sphere-3"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Сайдбар -->
+        <aside class="sidebar glass-panel">
+            <div class="logo-container">
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                <h2 class="logo-text">Study<span>Portal</span></h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Дашборд</span>
+                </button>
+                <button class="nav-item" data-tab="schedule">
+                    <i class="fas fa-table"></i>
+                    <span>Расписание</span>
+                </button>
+                <button class="nav-item" data-tab="notes">
+                    <i class="fas fa-pen"></i>
+                    <span>Заметки</span>
+                </button>
+                <button class="nav-item" data-tab="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Календарь</span>
+                </button>
+                <button class="nav-item" data-tab="resources">
+                    <i class="fas fa-book"></i>
+                    <span>Ресурсы</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info glass-panel">
+                    <i class="far fa-user-circle"></i>
+                    <span id="userDisplay">Ученик</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Поиск -->
+            <header class="search-header glass-panel">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Поиск в Google, YouTube, Wikipedia..." class="search-input" id="globalSearch">
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </header>
+
+            <!-- Контент вкладок -->
+            <div class="content-container">
+                <!-- Дашборд -->
+                <div class="tab-content active" id="dashboard">
+                    <h1 class="page-title">Главная</h1>
+                    
+                    <div class="widget-grid">
+                        <div class="widget glass-panel">
+                            <div class="widget-header">
+                                <i class="fas fa-clock widget-icon"></i>
+                                <h3>Сейчас</h3>
+                            </div>
+                            <div class="widget-content" id="clockWidget">
+                                <div class="time">--:--</div>
+                                <div class="date">---, -- ---</div>
+                            </div>
+                        </div>
+                        
+                        <div class="widget glass-panel">
+                            <div class="widget-header">
+                                <i class="fas fa-cloud-sun widget-icon"></i>
+                                <h3>Погода</h3>
+                            </div>
+                            <div class="widget-content" id="weatherWidget">
+                                <div class="weather-loading">Загрузка...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="widget glass-panel">
+                            <div class="widget-header">
+                                <i class="fas fa-bell widget-icon"></i>
+                                <h3>Ближайшее</h3>
+                            </div>
+                            <div class="widget-content" id="upcomingWidget">
+                                <div class="upcoming-item">Событий нет</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <button class="quick-action glass-panel" onclick="openModal('noteModal')">
+                            <i class="fas fa-plus"></i>
+                            <span>Быстрая заметка</span>
+                        </button>
+                        <button class="quick-action glass-panel" onclick="openModal('eventModal')">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Добавить событие</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Расписание -->
+                <div class="tab-content" id="schedule">
+                    <h1 class="page-title">Расписание звонков и предметы</h1>
+                    
+                    <!-- Расписание звонков (1 смена) -->
+                    <div class="schedule-section">
+                        <h2 class="subsection-title">⏰ Звонки (1 смена)</h2>
+                        <div class="schedule-table glass-panel">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Понедельник</th>
+                                        <th>Вторник/Пятница</th>
+                                        <th>Среда</th>
+                                        <th>Четверг</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Разговоры о важном 8:00–8:30</td><td>1 урок 8:00–8:40</td><td>Классный час 8:00–8:20</td><td>Россия — моя горняшка 8:00–8:50</td></tr>
+                                    <tr><td>1 урок 8:35–9:15</td><td>2 урок 8:50–9:30</td><td>1 урок 8:25–9:05</td><td>1 урок 8:35–9:15</td></tr>
+                                    <tr><td>2 урок 9:35–10:15</td><td>3 урок 9:50–10:30</td><td>2 урок 9:15–9:55</td><td>2 урок 9:35–10:15</td></tr>
+                                    <tr><td>3 урок 10:35–11:15</td><td>4 урок 10:50–11:30</td><td>3 урок 10:15–10:55</td><td>3 урок 10:35–11:15</td></tr>
+                                    <tr><td>4 урок 11:35–12:15</td><td>5 урок 11:50–12:30</td><td>4 урок 11:15–11:55</td><td>4 урок 11:35–12:15</td></tr>
+                                    <tr><td>5 урок 12:30–13:10</td><td>6 урок 12:50–13:30</td><td>5 урок 12:15–12:55</td><td>5 урок 12:30–13:10</td></tr>
+                                    <tr><td>6 урок 13:20–14:00</td><td>7 урок 13:40–14:20</td><td>6 урок 13:15–13:55</td><td>6 урок 13:20–14:00</td></tr>
+                                    <tr><td>7 урок 14:10–14:50</td><td>8 урок 14:50–15:30</td><td>7 урок 14:05–14:45</td><td>7 урок 14:10–14:50</td></tr>
+                                    <tr><td>8 урок 15:00–15:40</td><td>9 урок 15:20–16:00</td><td>8 урок 15:05–15:35</td><td>8 урок 15:00–15:40</td></tr>
+                                    <tr><td>9 урок 15:50–16:30</td><td></td><td>9 урок 15:45–16:25</td><td>9 урок 15:50–16:30</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Предметы по дням -->
+                    <div class="schedule-section">
+                        <h2 class="subsection-title">📚 Предметы</h2>
+                        
+                        <div class="subjects-grid">
+                            <div class="subject-day glass-panel">
+                                <h3>Понедельник</h3>
+                                <ul>
+                                    <li>Химия</li>
+                                    <li>Английский язык</li>
+                                    <li>Русский язык</li>
+                                    <li>Физика</li>
+                                    <li>Биология</li>
+                                    <li>Математика</li>
+                                    <li>История</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="subject-day glass-panel">
+                                <h3>Вторник</h3>
+                                <ul>
+                                    <li>География</li>
+                                    <li>ОБЗР</li>
+                                    <li>Математика</li>
+                                    <li>Физкультура</li>
+                                    <li>Обществознание</li>
+                                    <li>Литература</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="subject-day glass-panel">
+                                <h3>Среда</h3>
+                                <ul>
+                                    <li>Математика</li>
+                                    <li>Физкультура</li>
+                                    <li>Литература</li>
+                                    <li>Вероятность и стат.</li>
+                                    <li>Русский язык</li>
+                                    <li>Биология</li>
+                                    <li>Физика</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="subject-day glass-panel">
+                                <h3>Четверг</h3>
+                                <ul>
+                                    <li>Химия</li>
+                                    <li>Английский язык</li>
+                                    <li>История</li>
+                                    <li>Литература</li>
+                                    <li>Информатика</li>
+                                    <li>Математика</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="subject-day glass-panel">
+                                <h3>Пятница</h3>
+                                <ul>
+                                    <li>География</li>
+                                    <li>Русский язык</li>
+                                    <li>Математика</li>
+                                    <li>Английский язык</li>
+                                    <li>Физика</li>
+                                    <li>История/русский язык</li>
+                                    <li>Труд (технология)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Заметки -->
+                <div class="tab-content" id="notes">
+                    <h1 class="page-title">Заметки</h1>
+                    <div class="notes-controls">
+                        <button class="action-btn glass-panel" onclick="openModal('noteModal')">
+                            <i class="fas fa-plus"></i> Новая заметка
+                        </button>
+                    </div>
+                    <div class="notes-container" id="notesContainer">
+                        <!-- Заметки из Firebase -->
+                    </div>
+                </div>
+
+                <!-- Календарь -->
+                <div class="tab-content" id="calendar">
+                    <h1 class="page-title">Календарь мероприятий</h1>
+                    <div class="calendar-controls">
+                        <button class="action-btn glass-panel" onclick="openModal('eventModal')">
+                            <i class="fas fa-plus"></i> Добавить событие
+                        </button>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Календарь -->
+                    </div>
+                    
+                    <div class="events-list glass-panel">
+                        <h3>Предстоящие события</h3>
+                        <div id="eventsContainer">
+                            <!-- События из Firebase -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ресурсы -->
+                <div class="tab-content" id="resources">
+                    <h1 class="page-title">Полезные ресурсы</h1>
+                    <div class="resources-grid">
+                        <div class="resource-card glass-panel" onclick="window.open('https://www.google.com','_blank')">
+                            <i class="fab fa-google"></i>
+                            <h3>Google</h3>
+                            <p>Поиск</p>
+                        </div>
+                        <div class="resource-card glass-panel" onclick="window.open('https://www.youtube.com','_blank')">
+                            <i class="fab fa-youtube"></i>
+                            <h3>YouTube</h3>
+                            <p>Видеоуроки</p>
+                        </div>
+                        <div class="resource-card glass-panel" onclick="window.open('https://ru.wikipedia.org','_blank')">
+                            <i class="fab fa-wikipedia-w"></i>
+                            <h3>Wikipedia</h3>
+                            <p>Энциклопедия</p>
+                        </div>
+                        <div class="resource-card glass-panel" onclick="window.open('https://www.translate.ru','_blank')">
+                            <i class="fas fa-language"></i>
+                            <h3>Переводчик</h3>
+                            <p>Translate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Модальное окно для заметок -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content glass-panel">
+            <h3>Новая заметка</h3>
+            <input type="text" placeholder="Заголовок" id="noteTitle">
+            <textarea placeholder="Текст заметки..." id="noteContent" rows="5"></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal('noteModal')">Отмена</button>
+                <button class="modal-btn save" onclick="saveNote()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для событий -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content glass-panel">
+            <h3>Новое событие</h3>
+            <input type="text" placeholder="Название" id="eventTitle">
+            <input type="date" id="eventDate">
+            <input type="time" id="eventTime">
+            <textarea placeholder="Описание" id="eventDesc" rows="3"></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal('eventModal')">Отмена</button>
+                <button class="modal-btn save" onclick="saveEvent()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase config -->
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
